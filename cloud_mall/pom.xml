@@ -15,6 +15,7 @@
     <module>mall-ware</module>
     <module>mall-coupon</module>
     <module>mall-member</module>
+    <module>renren-fast</module>
   </modules>
 
 
