@@ -11,9 +11,9 @@ buildNumber.properties
 .mvn/wrapper/maven-wrapper.jar
 
 **/.idea/
-*.json
 *.iml
 **/target/
 **/libraries/
 *.ipr
 *.iws
+**/node_modules/
