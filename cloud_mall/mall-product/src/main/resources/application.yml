@@ -12,6 +12,7 @@ spring:
     password: sql123456
   main:
     allow-circular-references: true
+    allow-bean-definition-overriding: true
 mybatis-plus:
   mapper-locations: classpath:/mapper/**/*.xml
   # 自动自增id
