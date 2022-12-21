@@ -8,6 +8,22 @@ spring:
   cloud:
     gateway:
       routes:
+        - id: mall-product
+          uri: lb://mall-product
+          predicates:
+            - Path=/api/product/**
+          filters:
+            # 路径重写,把对应的api路径，重新成product
+            - RewritePath=/api/?(?<segment>.*),/$\{segment}
+
+        - id: admin_ruote
+          uri: lb://renren-fast
+          predicates:
+            - Path=/api/**
+          filters:
+            # 路径重写,把对应的api路径，重新成renren-fast
+            - RewritePath=/api/?(?<segment>.*),/renren-fast/$\{segment}
+
         - id: test_baidu
           uri: https://www.baidu.com
           predicates:
