@@ -45,8 +45,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
                     return childrenMenus;
                 })//排序
                 .sorted((CategoryEntity menu1,CategoryEntity menu2) ->{
-                    //
-                    return menu1.getSort() - menu2.getSort();
+                    return (menu1.getSort() == null?0:menu1.getSort()) - (menu2.getSort() == null?0:menu2.getSort());
                 })
                 //转换数据
                 .collect(Collectors.toList());
