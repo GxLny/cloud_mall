@@ -1,6 +1,11 @@
 <!--  -->
 <template>
   <div class="">
+    <div>
+      <el-row>
+        <el-button type="danger" @click="batchDelete">批量删除</el-button>
+      </el-row>
+    </div>
     <el-tree
       :data="treeData"
       :props="defaultProps"
@@ -8,7 +13,7 @@
       node-key="catId"
       :expand-on-click-node="false"
       :default-expanded-keys="expandedKeys"
-      @node-click="handleNodeClick"
+      ref="treeMenus"
     >
       <span class="custom-tree-node" slot-scope="{ node, data }">
         <span>{{ node.label }}</span>
@@ -21,6 +26,9 @@
           >
             添加
           </el-button>
+          <el-button type="text" size="mini" @click="() => edit(data)">
+            编辑
+          </el-button>
           <el-button
             v-if="node.childNodes.length == 0"
             type="text"
@@ -32,15 +40,26 @@
         </span>
       </span>
     </el-tree>
-    <el-dialog title="添加" :visible.sync="dialogTableVisible">
-      <el-form :model="form">
-        <el-form-item label="分类名称">
+    <el-dialog
+      :title="title"
+      :visible.sync="dialogTableVisible"
+      :close-on-click-modal="false"
+    >
+      <el-form :model="form" :rules="rules" ref="ruleForm">
+        <el-form-item label="分类名称" prop="name">
           <el-input v-model="form.name" autocomplete="off"></el-input>
+        </el-form-item>
+
+        <el-form-item label="图标">
+          <el-input v-model="form.icon" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="计量单位">
+          <el-input v-model="form.productUnit" autocomplete="off"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogTableVisible = false">取 消</el-button>
-        <el-button type="primary" @click="add">确 定</el-button>
+        <el-button type="primary" @click="submitData()">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -53,15 +72,38 @@ export default {
   data() {
     //这里存放数据
     return {
+      title: "", //对话框标题
       treeData: [], //树形数据
       expandedKeys: [], //需要展开的节点
       dialogTableVisible: false, //显示对话框
-      //表单
-      form: { name: "", parentCid: 0, catLevel: 0, showStatus: 1, sort: 0 },
+      //表单初始化内容
+      form: {
+        name: "",
+        parentCid: 0,
+        catLevel: 0,
+        showStatus: 1,
+        productUnit: "",
+        icon: "",
+        catId: null,
+      },
       url: {
         treeList: "/product/category/list/tree",
         delete: "/product/category/delete",
         add: "/product/category/save",
+        queryById: "/product/category/info/",
+        update: "/product/category/update",
+      },
+      //校验规则
+      rules: {
+        name: [
+          { required: true, message: "请输入分类名称", trigger: "blur" },
+          {
+            min: 2,
+            max: 10,
+            message: "长度在 2 到 10 个字符",
+            trigger: "blur",
+          },
+        ],
       },
       defaultProps: {
         children: "children",
@@ -75,15 +117,104 @@ export default {
   },
   //方法集合
   methods: {
-    //提交数据
+    batchDelete() {
+      let catIds = [];
+      let menusList = this.$refs.treeMenus.getCheckedNodes();
+      console.log("menus:", menusList);
+      for (let i = 0; i < menusList.length; i++) {
+        catIds.push(menusList[i].catId);
+      }
+
+      this.$confirm(`是否确认批量删除选中数据?`, "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          this.$http({
+            url: this.$http.adornUrl(this.url.delete),
+            method: "post",
+            data: this.$http.adornData(catIds, false),
+          }).then(({ data }) => {
+            this.expandedKeys = [data];
+            this.$message({
+              type: "success",
+              message: "删除成功!",
+            });
+            this.getTreeData();
+          });
+        })
+        .catch(() => {});
+
+
+
+
+    },
+    //提交表单
+    submitData() {
+      let { catId, name, icon, productUnit } = this.form;
+      //规则判断
+      this.$refs["ruleForm"].validate((valid) => {
+        if (valid) {
+          if (catId == null) {
+            //新增表单
+            this.add();
+          } else {
+            //修改表单
+            this.$http({
+              url: this.$http.adornUrl(this.url.update),
+              method: "post",
+              data: this.$http.adornData(
+                { catId, name, icon, productUnit },
+                false
+              ),
+            }).then(({ data }) => {
+              this.$message({
+                type: "success",
+                message: "修改成功!",
+              });
+              //关闭对话框
+              this.dialogTableVisible = false;
+              //重新更新数据
+              this.getTreeData();
+              //添加成功后重新展开节点
+              this.expandedKeys = [this.form.parentCid];
+            });
+          }
+        } else {
+          console.log("error submit!!");
+          return false;
+        }
+      });
+    },
+    //编辑
+    edit(data) {
+      this.title = "编辑分类";
+      this.dialogTableVisible = true;
+      this.$http({
+        url: this.$http.adornUrl(this.url.queryById + data.catId),
+        method: "get",
+      }).then(({ data }) => {
+        console.log("data::", data);
+        console.log("form::", this.form);
+        this.form.name = data.data.name;
+        this.form.catId = data.data.catId;
+        this.form.icon = data.data.icon;
+        this.form.catLevel = data.data.catLevel;
+        this.form.parentCid = data.data.parentCid;
+        this.form.productUnit = data.data.productUnit;
+      });
+    },
+    //新增数据
     add() {
       console.log("addData::", this.form);
+      //初始化数据
+      this.title = "新增分类";
       this.$http({
         url: this.$http.adornUrl(this.url.add),
         method: "post",
         data: this.$http.adornData(this.form, false),
       }).then(({ data }) => {
-        this.expandedKeys = [data];
         this.$message({
           type: "success",
           message: "添加成功!",
@@ -97,6 +228,14 @@ export default {
     },
     //打开对话框
     append(data) {
+      //初始化数据
+      this.form.name = "";
+      this.form.catId = null;
+      this.form.icon = "";
+      this.form.catLevel = 0;
+      this.form.parentCid = "";
+      this.form.productUnit = "";
+
       this.dialogTableVisible = true;
       //当点击某个节点添加时，会得到当前节点的信息
       //获取到当前节点的id作为新增节点父id
@@ -129,15 +268,7 @@ export default {
             this.expandedKeys = [node.parent.data.catId];
           });
         })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "已取消删除",
-          });
-        });
-    },
-    handleNodeClick(data) {
-      console.log(data);
+        .catch(() => {});
     },
     getTreeData() {
       this.$http({
