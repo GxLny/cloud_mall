@@ -1,0 +1,15 @@
+server:
+  port: 10000
+spring:
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+    alicloud:
+      access-key: LTAI5tA5PVD4YhKJfnigT5s8
+      secret-key: aM1AEQYcx9yxqEhfu8A1TmAdU9QFDa
+      oss:
+        endpoint: oss-cn-shenzhen.aliyuncs.com
+        bucket: lny-mall
+  application:
+    name: mall-third-party

@@ -16,6 +16,13 @@ spring:
             # 路径重写,把对应的api路径，重新成product
             - RewritePath=/api/?(?<segment>.*),/$\{segment}
 
+        - id: mall-third-party
+          uri: lb://mall-third-party
+          predicates:
+            - Path=/api/thirdparty/**
+          filters:
+            - RewritePath=/api/thirdparty/?(?<segment>.*),/$\{segment}
+
         - id: admin_ruote
           uri: lb://renren-fast
           predicates:
