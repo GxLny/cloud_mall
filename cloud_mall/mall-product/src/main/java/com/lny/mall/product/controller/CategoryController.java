@@ -2,18 +2,15 @@ package com.lny.mall.product.controller;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lny.mall.product.entity.CategoryEntity;
 import com.lny.mall.product.service.CategoryService;
-import com.lny.common.utils.PageUtils;
 import com.lny.common.utils.R;
 
 
@@ -67,7 +64,8 @@ public class CategoryController {
      */
     @RequestMapping("/update")
     public R update(@RequestBody CategoryEntity category){
-		categoryService.updateById(category);
+        //级联更新操作
+		categoryService.updateCascade(category);
 
         return R.ok();
     }

@@ -1,7 +1,11 @@
 package com.lny.mall.product.service.impl;
 
+import com.lny.mall.product.service.CategoryBrandRelationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -19,6 +23,9 @@ import com.lny.mall.product.service.CategoryService;
 
 @Service("categoryService")
 public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity> implements CategoryService {
+
+    @Autowired
+    private CategoryBrandRelationService categoryBrandRelationService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -57,6 +64,42 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         // todo 检查当前删除的菜单，是否被别的地方引用
         //逻辑删除
         baseMapper.deleteBatchIds(asList);
+    }
+
+    @Override
+    public Long[] findCatelogPath(Long attrGroupId) {
+        List<Long> paths = new ArrayList<>();
+        //递归查询父级id
+        List<Long> parents = findParents(attrGroupId, paths);
+        //把数据逆序排序
+        Collections.reverse(parents);
+        //转换成long数组格式
+        return parents.toArray(new Long[paths.size()]);
+    }
+
+    @Override
+    public void updateCascade(CategoryEntity category) {
+        this.updateById(category);
+        categoryBrandRelationService.updateCategory(category.getCatId(),category.getName());
+
+    }
+
+    /**
+     * 递归查询父级id
+     * @param attrGroupId
+     * @param paths
+     * @return
+     */
+    private List<Long> findParents(Long attrGroupId,List<Long> paths){
+        //添加当前节点id
+        paths.add(attrGroupId);
+        //查询当前节点信息
+        CategoryEntity categoryEntity = this.getById(attrGroupId);
+        //如果父节点id不为空，则继续往上级查询
+        if(categoryEntity.getParentCid() != 0){
+            findParents(attrGroupId,paths);
+        }
+        return paths;
     }
 
     /**

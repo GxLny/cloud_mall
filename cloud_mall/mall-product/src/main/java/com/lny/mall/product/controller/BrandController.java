@@ -85,12 +85,12 @@ public class BrandController {
     }
 
     /**
-     * 修改
+     * 为了保证冗余字段的数据一致性，需要做级联更新
      * 校验分组
      */
     @RequestMapping("/update")
     public R update(@Validated(UpdateGroup.class) @RequestBody BrandEntity brand){
-		brandService.updateById(brand);
+		brandService.updateDetail(brand);
 
         return R.ok();
     }
