@@ -1,15 +1,15 @@
 package com.lny.mall.product.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
+import com.lny.mall.product.entity.AttrEntity;
+import com.lny.mall.product.service.AttrService;
 import com.lny.mall.product.service.CategoryService;
+import com.lny.mall.product.vo.AttrGroupRelationVo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.lny.mall.product.entity.AttrGroupEntity;
 import com.lny.mall.product.service.AttrGroupService;
@@ -33,6 +33,24 @@ public class AttrGroupController {
     //商品分类
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private AttrService attrService;
+
+    /**
+     * 获取属性分组有关联的其他属性
+     * @param attrgroupId
+     * @return
+     */
+    ///product/attrgroup/{attrgroupId}/attr/relation
+    @GetMapping(value = "/{attrgroupId}/attr/relation")
+    public R attrRelation(@PathVariable("attrgroupId") Long attrgroupId) {
+
+        List<AttrEntity> entities = attrService.getRelationAttr(attrgroupId);
+
+        return R.ok().put("data",entities);
+    }
+
 
     /**
      * 列表
@@ -87,6 +105,17 @@ public class AttrGroupController {
     public R delete(@RequestBody Long[] attrGroupIds){
 		attrGroupService.removeByIds(Arrays.asList(attrGroupIds));
 
+        return R.ok();
+    }
+
+    /**
+     * 移除关联关系，支持批量删除
+     * @param vos
+     * @return
+     */
+    @PostMapping(value = "/attr/relation/delete")
+    public R deleteRelation(@RequestBody AttrGroupRelationVo[] vos) {
+        attrService.deleteRelation(vos);
         return R.ok();
     }
 

@@ -17,6 +17,7 @@ import com.lny.mall.product.entity.AttrGroupEntity;
 import com.lny.mall.product.entity.CategoryEntity;
 import com.lny.mall.product.service.AttrService;
 import com.lny.mall.product.service.CategoryService;
+import com.lny.mall.product.vo.AttrGroupRelationVo;
 import com.lny.mall.product.vo.AttrRespVo;
 import com.lny.mall.product.vo.AttrVo;
 import org.springframework.beans.BeanUtils;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -187,6 +189,39 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
 
 
 
+    }
+
+    @Override
+    public List<AttrEntity> getRelationAttr(Long attrgroupId) {
+        List<AttrAttrgroupRelationEntity> entities = relationDao.selectList
+                (new QueryWrapper<AttrAttrgroupRelationEntity>().eq("attr_group_id", attrgroupId));
+
+        List<Long> attrIds = entities.stream().map((attr) -> {
+            return attr.getAttrId();
+        }).collect(Collectors.toList());
+
+        //根据attrIds查找所有的属性信息
+        //Collection<AttrEntity> attrEntities = this.listByIds(attrIds);
+
+        //如果attrIds为空就直接返回一个null值出去
+        if (attrIds == null || attrIds.size() == 0) {
+            return null;
+        }
+
+        List<AttrEntity> attrEntityList = this.baseMapper.selectBatchIds(attrIds);
+
+        return attrEntityList;
+    }
+
+    @Override
+    public void deleteRelation(AttrGroupRelationVo[] vos) {
+        List<AttrAttrgroupRelationEntity> entities = Arrays.asList(vos).stream().map((item) -> {
+            AttrAttrgroupRelationEntity relationEntity = new AttrAttrgroupRelationEntity();
+            BeanUtils.copyProperties(item, relationEntity);
+            return relationEntity;
+        }).collect(Collectors.toList());
+        //批量删除
+        relationDao.deleteBatchRelation(entities);
     }
 
 }
