@@ -97,7 +97,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         CategoryEntity categoryEntity = this.getById(attrGroupId);
         //如果父节点id不为空，则继续往上级查询
         if(categoryEntity.getParentCid() != 0){
-            findParents(attrGroupId,paths);
+            findParents(categoryEntity.getParentCid(),paths);
         }
         return paths;
     }
