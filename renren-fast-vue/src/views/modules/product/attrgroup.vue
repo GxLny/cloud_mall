@@ -51,10 +51,9 @@
 <script>
 import Category from "../common/category";
 import AddOrUpdate from "./attrgroup-add-or-update";
-// import RelationUpdate from "./attr-group-relation";
+import RelationUpdate from "./attr-group-relation";
 export default {
-  //import引入的组件需要注入到对象中才能使用
-  components: { Category,AddOrUpdate},
+  components: { Category, AddOrUpdate, RelationUpdate },
   props: {},
   data() {
     return {
@@ -134,7 +133,6 @@ export default {
     // 新增 / 修改
     addOrUpdateHandle(id) {
       this.addOrUpdateVisible = true;
-      //渲染完成后执行下步操作
       this.$nextTick(() => {
         this.$refs.addOrUpdate.init(id);
       });
