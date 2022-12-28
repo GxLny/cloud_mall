@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.lny.common.utils.PageUtils;
 import com.lny.mall.product.entity.CategoryEntity;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,5 +17,30 @@ import java.util.Map;
 public interface CategoryService extends IService<CategoryEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    /**
+     * 获取数据结构
+     * @return
+     */
+    List<CategoryEntity> listWithTree();
+
+    /**
+     * 逻辑删除数据
+     * @param asList
+     */
+    void deleteMenus(List<Long> asList);
+
+    /**
+     * 查询子分类完整路径
+     * @param attrGroupId
+     * @return
+     */
+    Long[] findCatelogPath(Long attrGroupId);
+
+    /**
+     * 级联更新分类
+     * @param category
+     */
+    void updateCascade(CategoryEntity category);
 }
 

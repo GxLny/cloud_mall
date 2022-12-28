@@ -12,9 +12,15 @@ spring:
     password: sql123456
   main:
     allow-circular-references: true
+    allow-bean-definition-overriding: true
 mybatis-plus:
   mapper-locations: classpath:/mapper/**/*.xml
-  # 自动自增id
+
   global-config:
     db-config:
-      id-type: auto
+      id-type: auto   # 自动自增id
+      logic-delete-value: 1 # 逻辑已删除值(默认为 1)
+      logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
+logging:
+  level:
+    com.lny.mall.product: debug
