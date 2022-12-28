@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.lny.mall.product.entity.AttrEntity;
+import com.lny.mall.product.service.AttrAttrgroupRelationService;
 import com.lny.mall.product.service.AttrService;
 import com.lny.mall.product.service.CategoryService;
 import com.lny.mall.product.vo.AttrGroupRelationVo;
@@ -36,6 +37,32 @@ public class AttrGroupController {
 
     @Autowired
     private AttrService attrService;
+
+    @Autowired
+    private AttrAttrgroupRelationService relationService;
+
+    /**
+     * 批量保存属性分组关联关系
+     * @param vos
+     * @return
+     */
+    @PostMapping(value = "/attr/relation")
+    public R addRelation(@RequestBody List<AttrGroupRelationVo> vos) {
+        relationService.saveBatch(vos);
+        return R.ok();
+    }
+
+    /**
+     * 获取属性分组没有关联的其他属性
+     */
+    @GetMapping(value = "/{attrgroupId}/noattr/relation")
+    public R attrNoattrRelation(@RequestParam Map<String, Object> params,
+                                @PathVariable("attrgroupId") Long attrgroupId) {
+
+        PageUtils page = attrService.getNoRelationAttr(params,attrgroupId);
+
+        return R.ok().put("page",page);
+    }
 
     /**
      * 获取属性分组有关联的其他属性
