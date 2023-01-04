@@ -8,7 +8,7 @@ import java.util.Date;
 import lombok.Data;
 
 /**
- * spu信息介绍
+ * spu描述信息集
  * 
  * @author lny
  * @email lny@gmail.com
@@ -25,7 +25,7 @@ public class SpuInfoDescEntity implements Serializable {
 	@TableId
 	private Long spuId;
 	/**
-	 * 商品介绍
+	 * 描述信息
 	 */
 	private String decript;
 
