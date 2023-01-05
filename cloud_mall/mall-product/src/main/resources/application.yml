@@ -13,6 +13,9 @@ spring:
   main:
     allow-circular-references: true
     allow-bean-definition-overriding: true
+    # 时间格式化
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
 mybatis-plus:
   mapper-locations: classpath:/mapper/**/*.xml
 
