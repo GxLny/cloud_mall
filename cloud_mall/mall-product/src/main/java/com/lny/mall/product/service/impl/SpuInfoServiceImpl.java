@@ -1,6 +1,10 @@
 package com.lny.mall.product.service.impl;
 
+import com.lny.common.to.SkuReductionTo;
+import com.lny.common.to.SpuBoundTo;
+import com.lny.common.utils.R;
 import com.lny.mall.product.entity.*;
+import com.lny.mall.product.feign.CouponFeignService;
 import com.lny.mall.product.service.*;
 import com.lny.mall.product.vo.*;
 import org.apache.commons.lang.StringUtils;
@@ -21,6 +25,7 @@ import com.lny.common.utils.PageUtils;
 import com.lny.common.utils.Query;
 
 import com.lny.mall.product.dao.SpuInfoDao;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service("spuInfoService")
@@ -47,6 +52,8 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
     @Autowired
     private SkuSaleAttrValueService skuSaleAttrValueService;
 
+    @Autowired
+    private CouponFeignService couponFeignService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -58,6 +65,11 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         return new PageUtils(page);
     }
 
+    /**
+     * 开启事务
+     * @param spuSaveVo
+     */
+    @Transactional
     @Override
     public void saveSupInfo(SpuSaveVo spuSaveVo) {
         //1、保存spu基本信息：pms_spu_info
@@ -95,6 +107,16 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         productAttrValueService.saveProductAttr(collect);
 
         //5、保存当前spu对应的所有sku信息：pms_sku_info
+        Bounds bounds = spuSaveVo.getBounds();
+        SpuBoundTo spuBoundTo = new SpuBoundTo();
+        BeanUtils.copyProperties(bounds,spuBoundTo);
+        spuBoundTo.setSpuId(spuInfoEntity.getId());
+        R r = couponFeignService.saveSpuBounds(spuBoundTo);
+        if (r.getCode() != 0) {
+            log.error("远程保存spu积分信息失败");
+        }
+
+
         //5、1）、sku的基本信息:pms_sku_info
         List<Skus> skus = spuSaveVo.getSkus();
         if(skus!=null && skus.size()>0){
@@ -123,6 +145,9 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
                     skuImagesEntity.setImgUrl(img.getImgUrl());
                     skuImagesEntity.setDefaultImg(img.getDefaultImg());
                     return skuImagesEntity;
+                }).filter(entity -> {
+                    //过滤没有选中的商品图片，返回true就是需要，false就是剔除
+                    return !StringUtils.isEmpty(entity.getImgUrl());
                 }).collect(Collectors.toList());
 
                 //5、2）、sku的图片信息：pms_sku_images
@@ -139,6 +164,16 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
                 skuSaleAttrValueService.saveBatch(skuSaleAttrValueEntities);
                 //5、4）、sku的优惠、满减等信息：gulimall_sms--->sms_sku_ladder、sms_sku_full_reduction、sms_member_price
+                SkuReductionTo skuReductionTo = new SkuReductionTo();
+                BeanUtils.copyProperties(item,skuReductionTo);
+                skuReductionTo.setSkuId(skuId);
+                //有优惠或满减选项时才调用远程服务
+                if (skuReductionTo.getFullCount() > 0 || skuReductionTo.getFullPrice().compareTo(BigDecimal.ZERO) == 1) {
+                    R r1 = couponFeignService.saveSkuReduction(skuReductionTo);
+                    if (r1.getCode() != 0) {
+                        log.error("远程保存sku积分信息失败");
+                    }
+                }
             });
 
         }
