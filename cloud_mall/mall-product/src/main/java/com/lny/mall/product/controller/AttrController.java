@@ -1,8 +1,11 @@
 package com.lny.mall.product.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
+import com.lny.mall.product.entity.ProductAttrValueEntity;
+import com.lny.mall.product.service.ProductAttrValueService;
 import com.lny.mall.product.vo.AttrRespVo;
 import com.lny.mall.product.vo.AttrVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +30,9 @@ import com.lny.common.utils.R;
 public class AttrController {
     @Autowired
     private AttrService attrService;
+
+    @Autowired
+    private ProductAttrValueService productAttrValueService;
 
     /**
      * 格参数查询
@@ -77,6 +83,22 @@ public class AttrController {
     @RequestMapping("/update")
     public R update(@RequestBody AttrVo attr){
 		attrService.updateAttrById(attr);
+
+        return R.ok();
+    }
+
+    /**
+     * 更新规格参数
+     * @param spuId
+     * @param entities
+     * @return
+     */
+    @PostMapping("/update/{spuId}")
+    //@RequiresPermissions("product:attr:update")
+    public R updateSpuAttr(@PathVariable("spuId") Long spuId,
+                           @RequestBody List<ProductAttrValueEntity> entities){
+
+        productAttrValueService.updateSpuAttr(spuId,entities);
 
         return R.ok();
     }
