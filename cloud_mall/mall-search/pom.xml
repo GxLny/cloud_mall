@@ -14,7 +14,7 @@
 
     <properties>
         <java.version>1.8</java.version>
-<!--        <elasticsearch.version>7.6.2</elasticsearch.version>-->
+        <elasticsearch.version>7.6.2</elasticsearch.version>
     </properties>
 
 <!--    管理子包项目版本要一致-->
@@ -30,6 +30,11 @@
                 <artifactId>elasticsearch</artifactId>
                 <version>7.6.2</version>
             </dependency>
+<!--            <dependency>-->
+<!--                <groupId>org.apache.lucene</groupId>-->
+<!--                <artifactId>lucene-core</artifactId>-->
+<!--                <version>7.7.2</version>-->
+<!--            </dependency>-->
         </dependencies>
     </dependencyManagement>
 
@@ -48,14 +53,34 @@
             <groupId>org.elasticsearch.client</groupId>
             <artifactId>elasticsearch-rest-high-level-client</artifactId>
             <version>7.6.2</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.lucene</groupId>
+                    <artifactId>lucene-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
-
-
+<!--        <dependency>-->
+<!--            <groupId>org.elasticsearch.client</groupId>-->
+<!--            <artifactId>elasticsearch-rest-client</artifactId>-->
+<!--            <version>7.6.2</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>org.elasticsearch</groupId>-->
+<!--            <artifactId>elasticsearch</artifactId>-->
+<!--            <version>7.6.2</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>org.apache.lucene</groupId>-->
+<!--            <artifactId>lucene-core</artifactId>-->
+<!--            <version>8.4.0</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
 
         <!--        alibaba 配置中心依赖  -->
         <dependency>
@@ -67,6 +92,17 @@
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
         </dependency>
+
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>elastic-lucene-snapshots</id>
+            <name>Elastic Lucene Snapshots</name>
+            <url>http://s3.amazonaws.com/download.elasticsearch.org/lucenesnapshots/83f9835</url>
+            <releases><enabled>true</enabled></releases>
+            <snapshots><enabled>false</enabled></snapshots>
+        </repository>
+    </repositories>
 
 </project>
