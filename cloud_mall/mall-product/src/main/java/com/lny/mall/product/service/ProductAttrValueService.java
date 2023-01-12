@@ -30,5 +30,12 @@ public interface ProductAttrValueService extends IService<ProductAttrValueEntity
      * @param entities
      */
     void updateSpuAttr(Long spuId, List<ProductAttrValueEntity> entities);
+
+    /**
+     * 查出当前sku的所有可以被用来检索的规格属性
+     * @param spuId
+     * @return
+     */
+    List<ProductAttrValueEntity> baseAttrListforspu(Long spuId);
 }
 

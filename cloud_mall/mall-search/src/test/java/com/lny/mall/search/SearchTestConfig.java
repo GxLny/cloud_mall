@@ -5,6 +5,7 @@ import com.lny.mall.search.config.ElasticSearchConfig;
 import lombok.Data;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.junit.Test;
@@ -27,29 +28,26 @@ public class SearchTestConfig {
      * 添加/修改 测试es数据
      */
     @Test
-    public void indexData() throws IOException {
+    public void indexDataTest() throws IOException {
         //新建一个索引
         IndexRequest indexRequest = new IndexRequest("users");
         //数据id
         indexRequest.id("1");
-//        indexRequest.type("_doc");
-
-        //通过对象赚json方式存储到es
+        //通过对象转json方式存储到es
         User user = new User();
-        user.setUserName("zhangsan1");
+        user.setUserName("zhangsan");
         user.setGender("男");
-        user.setAge(20);
+        user.setAge(22);
         //转json
         String jsonString = JSON.toJSONString(user);
         indexRequest.source(jsonString, XContentType.JSON);  //要保存的内容
 
         //执行操作
-        IndexResponse index = restHighLevelClient.index(indexRequest, ElasticSearchConfig.COMMON_OPTIONS);
-
+        IndexResponse index = restHighLevelClient.index(indexRequest, RequestOptions.DEFAULT);
         //输入结果
         System.out.println(index);
-
     }
+
 
     @Data
     class User {
