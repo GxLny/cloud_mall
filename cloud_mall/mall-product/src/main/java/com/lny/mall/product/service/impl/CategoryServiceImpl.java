@@ -84,6 +84,12 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     }
 
+    @Override
+    public List<CategoryEntity> getLevel1Categorys() {
+
+        return this.list(new QueryWrapper<CategoryEntity>().eq("parent_cid",0));
+    }
+
     /**
      * 递归查询父级id
      * @param attrGroupId
