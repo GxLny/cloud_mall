@@ -8,6 +8,22 @@ spring:
   cloud:
     gateway:
       routes:
+        - id: mall-ware
+          uri: lb://mall-ware
+          predicates:
+            - Path=/api/ware/**
+          filters:
+            # 路径重写
+            - RewritePath=/api/?(?<segment>.*),/$\{segment}
+
+        - id: mall-member
+          uri: lb://mall-member
+          predicates:
+            - Path=/api/member/**
+          filters:
+            # 路径重写,把对应的api路径，重新成product
+            - RewritePath=/api/?(?<segment>.*),/$\{segment}
+
         - id: mall-product
           uri: lb://mall-product
           predicates:

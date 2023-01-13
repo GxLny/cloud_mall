@@ -3,6 +3,7 @@ package com.lny.mall.product.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.lny.common.utils.PageUtils;
 import com.lny.mall.product.entity.SpuInfoEntity;
+import com.lny.mall.product.vo.SpuSaveVo;
 
 import java.util.Map;
 
@@ -16,5 +17,30 @@ import java.util.Map;
 public interface SpuInfoService extends IService<SpuInfoEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    /**
+     * 保存spu所有信息
+     * @param spuSaveVo
+     */
+    void saveSupInfo(SpuSaveVo spuSaveVo);
+
+    /**
+     * 保存spu基本信息
+     * @param spuInfoEntity
+     */
+    void saveBaseSpuInfo(SpuInfoEntity spuInfoEntity);
+
+    /**
+     * 条件查询spu
+     * @param params
+     * @return
+     */
+    PageUtils queryPageByCondition(Map<String, Object> params);
+
+    /**
+     * 商品商家
+     * @param spuId
+     */
+    void up(Long spuId);
 }
 
