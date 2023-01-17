@@ -3,6 +3,7 @@ package com.lny.mall.product.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.lny.common.utils.PageUtils;
 import com.lny.mall.product.entity.CategoryEntity;
+import com.lny.mall.product.vo.Catelog2Vo;
 
 import java.util.List;
 import java.util.Map;
@@ -48,5 +49,11 @@ public interface CategoryService extends IService<CategoryEntity> {
      * @return
      */
     List<CategoryEntity> getLevel1Categorys();
+
+    /**
+     * 获取二级分类和三级分类
+     * @return
+     */
+    Map<String, List<Catelog2Vo>> getCatalogJson();
 }
 
